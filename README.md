@@ -104,16 +104,24 @@ a campanha diziam a mesma coisa.
 
 Site estático. Na Vercel, importar o repositório e publicar sem build.
 
-Domínios previstos (já reconhecidos pelo backend, caso o `?aba=` se perca):
+Domínios no ar, todos reconhecidos pelo backend caso o `?aba=` se perca:
 
-| BU      | domínio                          |
-|---------|----------------------------------|
-| CPPEM   | `indique.cppem.com.br`           |
-| UNICIVE | `indique.unicive.cppem.com.br`   |
-| COLÉGIO | `indique.colegio.cppem.com.br`   |
+| BU | domínio | projeto Vercel |
+|---|---|---|
+| CPPEM | `indica.cppem.com.br` | `indicacao-cppem` |
+| COLÉGIO | `indica.colegio.cppem.com.br` | `indicacao-colegio` |
+| UNICIVE | `indica.unicive.cppem.com.br` | `indicacao-unicive` |
 
-Publicar em outro domínio funciona — o `?aba=` decide sozinho. Mas se mudar,
-vale acertar a lista `DOMINIOS` no Apps Script.
+Os endereços `indicacao-*.vercel.app` continuam valendo e também estão na
+lista `DOMINIOS`, porque podem ter sido compartilhados antes do domínio
+próprio entrar.
+
+Os três projetos estão conectados aos repositórios: um `git push` publica
+sozinho.
+
+Publicar em outro domínio funciona, porque o `?aba=` decide sozinho. Mas se
+mudar, **acerte a lista `DOMINIOS` no Apps Script**: ela é a rede que segura o
+link compartilhado sem o parâmetro.
 
 ---
 

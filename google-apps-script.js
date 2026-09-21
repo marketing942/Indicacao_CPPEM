@@ -10,10 +10,10 @@
      aba COLEGIO_Novo captura-colegio
      aba Venda_Direta operacao-alvorada, apostila, site-cppem /qg e o
                       modal de WhatsApp — venda direta, fora do funil
-     aba INDICAÇÕES   indique-cppem, indique-unicive, indique-colegio — o
-                      programa de indicação. Layout próprio: quem indica e
-                      quem foi indicado na MESMA linha, e coluna BU no lugar
-                      da Origem
+     aba INDICAÇÕES   indica.cppem.com.br, indica.colegio.cppem.com.br e
+                      indica.unicive.cppem.com.br — o programa de indicação.
+                      Layout próprio: quem indica e quem foi indicado na MESMA
+                      linha, e coluna BU no lugar da Origem
      aba IGNORADOS    só o que o script não reconheceu. Deve viver VAZIA:
                       linha aqui é sinal de configuração quebrada
 
@@ -184,9 +184,9 @@ const ORIGENS = {
   COLEGIO:             "COLEGIO", // captura-colegio
 
   // → aba INDICAÇÕES
-  INDICACAO_CPPEM:     "INDICACAO_CPPEM",   // indique-cppem
-  INDICACAO_UNICIVE:   "INDICACAO_UNICIVE", // indique-unicive
-  INDICACAO_COLEGIO:   "INDICACAO_COLEGIO", // indique-colegio
+  INDICACAO_CPPEM:     "INDICACAO_CPPEM",   // indica.cppem.com.br
+  INDICACAO_UNICIVE:   "INDICACAO_UNICIVE", // indica.unicive.cppem.com.br
+  INDICACAO_COLEGIO:   "INDICACAO_COLEGIO", // indica.colegio.cppem.com.br
 
   // → aba Venda_Direta
   QG:                  "QG",        // site-cppem /qg
@@ -212,11 +212,28 @@ const DOMINIOS = [
   /* Indicação vem antes de tudo: os três domínios terminam em cppem.com.br e
      casariam com as regras de baixo. Na prática o ?aba= já decide sozinho
      (ORIGENS_CONFIAVEIS), mas a dedução precisa estar certa de qualquer forma
-     — é ela que socorre um link compartilhado sem o parâmetro. As duas mais
-     específicas vêm primeiro: a regra do CPPEM casaria com as três. */
-  { teste: /\/\/indique[a-z0-9.-]*\.unicive\.cppem\.com\.br/i, chave: "INDICACAO_UNICIVE" },
-  { teste: /\/\/indique[a-z0-9.-]*\.colegio\.cppem\.com\.br/i, chave: "INDICACAO_COLEGIO" },
-  { teste: /\/\/indique[a-z0-9.-]*\.cppem\.com\.br/i,          chave: "INDICACAO_CPPEM" },
+     — é ela que socorre um link compartilhado sem o parâmetro.
+
+     A da UniCive é a que mais importa. Sem ela, "unicive" no endereço é
+     encontrado pela regra de CAMPANHAS e a indicação cai na aba UNICIVE_Novo,
+     contada como lead de captura. As outras duas, sem regra, cairiam em
+     IGNORADOS: errado também, mas pelo menos visível.
+
+     `indic(a|que)` cobre os dois prefixos: os domínios no ar são indica.*, e
+     os links curtos publicados (links.cppem.com.br/cppem-indique) usam
+     "indique". Se um dia virar alias de verdade, já está previsto.
+
+     As duas mais específicas vêm primeiro, porque indica.colegio e
+     indica.unicive também terminam em cppem.com.br. */
+  { teste: /\/\/indic(a|que)[a-z0-9-]*\.unicive\.cppem\.com\.br/i, chave: "INDICACAO_UNICIVE" },
+  { teste: /\/\/indic(a|que)[a-z0-9-]*\.colegio\.cppem\.com\.br/i, chave: "INDICACAO_COLEGIO" },
+  { teste: /\/\/indic(a|que)[a-z0-9-]*\.cppem\.com\.br/i,          chave: "INDICACAO_CPPEM" },
+
+  /* Os endereços da Vercel continuam funcionando e podem ter sido
+     compartilhados antes do domínio próprio entrar. */
+  { teste: /\/\/indicacao-unicive[a-z0-9-]*\.vercel\.app/i,        chave: "INDICACAO_UNICIVE" },
+  { teste: /\/\/indicacao-colegio[a-z0-9-]*\.vercel\.app/i,        chave: "INDICACAO_COLEGIO" },
+  { teste: /\/\/indicacao-cppem[a-z0-9-]*\.vercel\.app/i,          chave: "INDICACAO_CPPEM" },
 
   { teste: /\/\/(www\.)?cppem\.com\.br\/qg/i,           chave: "QG" },
   { teste: /\/\/(www\.)?cppem\.com\.br\/turmas/i,       chave: "TURMAS" },
