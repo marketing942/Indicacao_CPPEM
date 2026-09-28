@@ -131,20 +131,38 @@ link compartilhado sem o parâmetro.
 
 ```js
 const BU = {
-  chave: "INDICACAO_UNICIVE",   // ou INDICACAO_COLEGIO
-  nome: "UNICIVE",
-  whatsapp: "5581992640766",
-  whatsappMsg: "..."
+  chave: "INDICACAO_CPPEM",     // decide a coluna BU no backend
+  nome: "CPPEM",                // vai junto nos eventos de dataLayer
+  whatsapp: "5581973105354",
+  whatsappMsg: "...",
+  pedirChavePix: false,         // ver abaixo
+  selo: { ate: 10, prefixo: "", sufixo: "%" }
 };
 ```
 
-Valores já configurados no backend:
+As três, lado a lado:
 
-| BU      | `chave`              | coluna BU | WhatsApp        |
-|---------|----------------------|-----------|-----------------|
-| CPPEM   | `INDICACAO_CPPEM`    | `CPPEM`   | `5581973105354` |
-| UNICIVE | `INDICACAO_UNICIVE`  | `UNICIVE` | `5581992640766` |
-| COLÉGIO | `INDICACAO_COLEGIO`  | `COLEGIO` | `5581997076388` |
+| | CPPEM | COLÉGIO | UNICIVE |
+|---|---|---|---|
+| `chave` | `INDICACAO_CPPEM` | `INDICACAO_COLEGIO` | `INDICACAO_UNICIVE` |
+| coluna BU | `CPPEM` | `COLEGIO` | `UNICIVE` |
+| WhatsApp | `5581973105354` | `5581997076388` | `5581992640766` |
+| `pedirChavePix` | `false` | `false` | `true` |
+| `selo` | 10% | R$ 100 | 60% |
+
+### Por que a chave PIX está desligada aqui
+
+A recompensa do CPPEM é **Créditos CPPEM, material digital e desconto**, tudo
+aplicado pela própria equipe. Não existe pagamento em dinheiro, então pedir a
+chave seria atrito num formulário de um minuto em troca de um dado que ninguém
+usaria.
+
+O campo continua no `index.html`, escondido e fora da validação. Trocar
+`pedirChavePix` para `true` devolve tudo, sem mais nenhuma alteração.
+
+A coluna `Chave pix indicador` fica vazia nas linhas de BU `CPPEM`. É o
+esperado, não é falha. A UniCive é a única das três que preenche, porque lá o
+prêmio cai mesmo na chave Pix do indicador.
 
 > Escrever qualquer outra coisa em `chave` manda a indicação para a aba
 > `IGNORADOS`. Essa aba é rede de segurança, não destino: linha ali é sinal de
@@ -206,15 +224,14 @@ Há um `<noscript>` no `<head>` que revela os cards: eles nascem em
 
 ### O formulário
 
-Cinco campos, todos obrigatórios:
+Quatro campos, todos obrigatórios (cinco se `pedirChavePix` for ligado):
 
-| campo                  | validação |
-|------------------------|-----------|
-| Seu nome completo      | nome e sobrenome |
-| Seu WhatsApp           | DDD válido + 9 dígitos, o 9 na terceira posição |
-| Sua chave PIX          | CPF ou CNPJ com dígito verificador, telefone, e-mail ou chave aleatória |
-| Nome do indicado       | nome e sobrenome |
-| WhatsApp do indicado   | mesma regra, e não pode ser igual ao seu |
+| campo | validação |
+|---|---|
+| Seu nome completo | nome e sobrenome |
+| Seu WhatsApp | DDD válido + 9 dígitos, o 9 na terceira posição |
+| Nome do indicado | nome e sobrenome |
+| WhatsApp do indicado | mesma regra, e não pode ser igual ao seu |
 
 O envio espera a requisição sair antes de mostrar sucesso (`await`), ao
 contrário das LPs de captura, que disparam e redirecionam. Como a pessoa
@@ -224,8 +241,8 @@ próxima indicação.
 ### Indicar mais de uma pessoa
 
 Na tela de sucesso, **"Indicar outra pessoa"** limpa apenas os dois campos do
-indicado e devolve o formulário com nome, WhatsApp e chave PIX do indicador
-ainda preenchidos. A partir da segunda, aparece um contador — ele é local (só
+indicado e devolve o formulário com o nome e o WhatsApp do indicador ainda
+preenchidos. A partir da segunda, aparece um contador — ele é local (só
 desta sessão) e serve de confirmação visual. O placar que vale é o do time, na
 planilha.
 

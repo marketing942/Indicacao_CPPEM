@@ -30,10 +30,17 @@ const BU = {
   whatsapp: "5581973105354",
   whatsappMsg: "Oi! Acabei de indicar alguém pelo programa de indicação do CPPEM.",
 
-  /* Aqui a recompensa em dinheiro é paga por PIX, então a chave é pedida.
-     No Colégio isto é `false` — lá o benefício é desconto e fardamento,
-     aplicados pela própria escola. */
-  pedirChavePix: true,
+  /* No CPPEM a recompensa é Créditos CPPEM, material digital e desconto,
+     tudo aplicado pela própria equipe. Não existe pagamento em dinheiro, então
+     pedir a chave seria atrito num formulário de um minuto em troca de um dado
+     que ninguém usaria. A coluna "Chave pix indicador" da planilha fica vazia
+     nas linhas com BU = CPPEM, e isso é o esperado.
+
+     Na UniCive isto é `true`: lá o prêmio cai na chave Pix do indicador.
+
+     Virar para `true` devolve o campo, já validado, sem mais nada a mudar: o
+     HTML dele continua no index.html. */
+  pedirChavePix: false,
 
   /* O selo animado da faixa "para quem você indicar". O anel fecha a volta
      inteira enquanto o número sobe até `ate` — o gesto é de "carregando",
@@ -93,6 +100,7 @@ const placarEl    = document.getElementById("sucesso-placar");
 const botaoEnviar = document.getElementById("ind_enviar");
 const botaoOutra  = document.getElementById("ind_outra");
 const pixTipoEl   = document.getElementById("pix-tipo");
+const campoPixEl  = document.getElementById("campo-pix");
 
 const campos = {
   nome:              document.getElementById("ind_nome"),
@@ -103,8 +111,16 @@ const campos = {
 };
 
 /* Campos que voltam a ficar em branco quando a pessoa indica outra pessoa.
-   Os dados de quem indica ficam — a graça de indicar várias é não redigitar. */
+   Os dados de quem indica ficam: a graça de indicar várias é não redigitar. */
 const CAMPOS_DO_INDICADO = [campos.nomeIndicado, campos.telefoneIndicado];
+
+/* Quando `pedirChavePix` é false, a chave some do formulário. Esconder não
+   basta: um input escondido continua sendo enviado e validado, então ele
+   também é esvaziado e sai da lista de regras (ver `validar`). */
+if (!BU.pedirChavePix && campoPixEl) {
+  campoPixEl.hidden = true;
+  campos.pix.value = "";
+}
 
 /* ---------- WhatsApp ---------- */
 
@@ -168,9 +184,9 @@ function telefoneValido(valor) {
 /* =========================================================
    Chave PIX
 
-   Aceita os quatro tipos que o Banco Central define. A validação existe para
-   pegar erro de digitação — quem recebe a recompensa é identificado por essa
-   chave, e uma chave errada é dor de cabeça dos dois lados.
+   Fica aqui mesmo desligada: é o que permite religar o campo trocando uma
+   linha no bloco BU, sem reescrever validação nenhuma. A UniCive, que paga
+   em dinheiro, usa este mesmo código com `pedirChavePix: true`.
    ========================================================= */
 
 function digitosIguais(d) {
@@ -271,12 +287,21 @@ function validar() {
   let ok = true;
 
   const regras = [
-    [campos.nome,             nomeValido,       "Informe seu nome e sobrenome."],
-    [campos.telefone,         telefoneValido,   "Informe seu WhatsApp com DDD. Exemplo: (81) 90000-0000."],
-    [campos.pix,              (v) => !!tipoDaChavePix(v), "Chave PIX inválida. Use CPF, telefone, e-mail ou chave aleatória."],
-    [campos.nomeIndicado,     nomeValido,       "Informe o nome e o sobrenome de quem você está indicando."],
-    [campos.telefoneIndicado, telefoneValido,   "Informe o WhatsApp da pessoa com DDD. Exemplo: (81) 90000-0000."]
+    [campos.nome,             nomeValido,     "Informe seu nome e sobrenome."],
+    [campos.telefone,         telefoneValido, "Informe seu WhatsApp com DDD. Exemplo: (81) 90000-0000."],
+    [campos.nomeIndicado,     nomeValido,     "Informe o nome e o sobrenome de quem você está indicando."],
+    [campos.telefoneIndicado, telefoneValido, "Informe o WhatsApp da pessoa com DDD. Exemplo: (81) 90000-0000."]
   ];
+
+  /* Só entra na lista quando o campo está em uso. Um input escondido nunca
+     pode barrar um envio, porque a pessoa não tem como corrigi-lo. */
+  if (BU.pedirChavePix) {
+    regras.splice(2, 0, [
+      campos.pix,
+      (v) => !!tipoDaChavePix(v),
+      "Chave PIX inválida. Use CPF, telefone, e-mail ou chave aleatória."
+    ]);
+  }
 
   regras.forEach(([input, teste, msg]) => {
     limparErro(input);

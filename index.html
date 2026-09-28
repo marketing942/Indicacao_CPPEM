@@ -159,6 +159,9 @@
     legend b{display:grid;width:22px;height:22px;place-items:center;border:1px solid var(--border-active);border-radius:50%;font:700 .7rem/1 var(--font-display)}
 
     .campo{display:grid;gap:.35rem}
+    /* O [hidden] do navegador perde para a regra de classe acima. Sem esta
+       linha, esconder um campo pelo script não teria efeito nenhum. */
+    .campo[hidden]{display:none}
     .campo+.campo{margin-top:.8rem}
     .campo label{color:var(--text-soft);font:600 .78rem/1.3 var(--font-ui);letter-spacing:.05em;text-transform:uppercase}
     .campo input{width:100%;min-height:46px;padding:.7rem .9rem;border:1px solid var(--border);border-radius:.5rem;background:rgba(10,10,11,.7);color:var(--text);font-size:1rem;transition:border-color .18s ease,background .18s ease}
@@ -483,10 +486,14 @@
                   <span class="erro" data-erro-de="ind_telefone"></span>
                 </div>
 
-                <div class="campo">
+                <!-- Escondido nesta BU: a recompensa do CPPEM é Créditos CPPEM,
+                     material digital e desconto, aplicados pela própria equipe.
+                     Não há pagamento em dinheiro, então a chave não tem uso.
+                     Volta a aparecer trocando `pedirChavePix` no script.js. -->
+                <div class="campo" id="campo-pix">
                   <label for="ind_pix">Sua chave PIX</label>
                   <input type="text" id="ind_pix" name="ind_pix" autocomplete="off" placeholder="CPF, telefone, e-mail ou chave aleatória" />
-                  <span class="ajuda">É por ela que a recompensa em dinheiro chega até você.</span>
+                  <span class="ajuda">É por ela que a recompensa chega até você.</span>
                   <span class="pix-tipo" id="pix-tipo"></span>
                   <span class="erro" data-erro-de="ind_pix"></span>
                 </div>
