@@ -135,7 +135,6 @@ const BU = {
   nome: "CPPEM",                // vai junto nos eventos de dataLayer
   whatsapp: "5581973105354",
   whatsappMsg: "...",
-  pedirChavePix: false,         // ver abaixo
   selo: { ate: 10, prefixo: "", sufixo: "%" }
 };
 ```
@@ -147,22 +146,27 @@ As três, lado a lado:
 | `chave` | `INDICACAO_CPPEM` | `INDICACAO_COLEGIO` | `INDICACAO_UNICIVE` |
 | coluna BU | `CPPEM` | `COLEGIO` | `UNICIVE` |
 | WhatsApp | `5581973105354` | `5581997076388` | `5581992640766` |
-| `pedirChavePix` | `false` | `false` | `true` |
 | `selo` | 10% | R$ 100 | 60% |
 
-### Por que a chave PIX está desligada aqui
+### A chave PIX não existe nesta página
 
 A recompensa do CPPEM é **Créditos CPPEM, material digital e desconto**, tudo
-aplicado pela própria equipe. Não existe pagamento em dinheiro, então pedir a
-chave seria atrito num formulário de um minuto em troca de um dado que ninguém
-usaria.
+aplicado pela própria equipe. Não existe pagamento em dinheiro, então a chave
+nunca teve uso aqui.
 
-O campo continua no `index.html`, escondido e fora da validação. Trocar
-`pedirChavePix` para `true` devolve tudo, sem mais nenhuma alteração.
+Ela foi **removida de vez**, não escondida: saiu do HTML, do CSS e do JS, junto
+com a validação de CPF, CNPJ e chave aleatória que só existia para ela. Campo
+escondido continua no código-fonte e volta a aparecer se o `script.js` falhar
+ao carregar.
 
-A coluna `Chave pix indicador` fica vazia nas linhas de BU `CPPEM`. É o
-esperado, não é falha. A UniCive é a única das três que preenche, porque lá o
-prêmio cai mesmo na chave Pix do indicador.
+A **UniCive é a única das três que pede a chave**, porque lá o prêmio cai mesmo
+no Pix do indicador. Para trazer o campo de volta, o caminho é copiar da
+`indicaçõesUNICIVE`: o bloco `#campo-pix` no `index.html` e a seção `Chave Pix`
+do `script.js`.
+
+O formulário não manda mais `chave_pix`. O backend usa `pegar()`, que devolve
+`""` quando a chave não vem, então a coluna `Chave pix indicador` continua
+gravando célula vazia, e não `undefined`.
 
 > Escrever qualquer outra coisa em `chave` manda a indicação para a aba
 > `IGNORADOS`. Essa aba é rede de segurança, não destino: linha ali é sinal de
@@ -224,7 +228,7 @@ Há um `<noscript>` no `<head>` que revela os cards: eles nascem em
 
 ### O formulário
 
-Quatro campos, todos obrigatórios (cinco se `pedirChavePix` for ligado):
+Quatro campos, todos obrigatórios:
 
 | campo | validação |
 |---|---|
